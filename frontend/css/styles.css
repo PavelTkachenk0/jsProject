@@ -1,0 +1,119 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+main {
+    padding: 20px;
+    margin-bottom: 2rem;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Стили для формы добавления курсов */
+.add-course-form {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Стили для кнопки добавления курса */
+.add-course-button {
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* Стили для кнопки добавления курса при наведении */
+.add-course-button:hover {
+    background-color: #45a049; /* Темно-зеленый цвет */
+}
+
+/* Стили для заголовка формы */
+.form-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.table-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* Разрешить горизонтальную прокрутку, если содержимое превышает размер контейнера */
+}
+
+/* Стили для поля ввода */
+input[type=text], textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+/* Стили для кнопки отправки формы */
+button[type=submit] {
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Стили для кнопки отправки формы при наведении */
+button[type=submit]:hover {
+    background-color: #45a049; /* Темно-зеленый цвет */
+}
+
+.contact-form form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
