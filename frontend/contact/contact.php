@@ -73,7 +73,6 @@ if (!isset($_SESSION['username'])) {
             <li><a href="../about/about.php"> О нас</a></li>
             <li><a href="../courses/courses.php">Курсы</a></li>
             <li><a href="contact.php">Контакты</a></li>
-            <li><a href="messages.php">Сообщения</a></li>
             <li><a href="../security/logout.php">Выход</a></li>
         </ul>
     </nav>
@@ -95,6 +94,13 @@ if (!isset($_SESSION['username'])) {
                 <textarea id="message" name="message" rows="4" required placeholder="сообщение"></textarea><br>
                 <button type="submit">Отправить</button>
             </form>
+        </div>
+        <div>
+            <?php
+                echo "<form action=\"messages.php\" method\"get\">";
+                echo "<button type=\"pick\">Просмотр сообщений</button>";
+                echo "</form>";
+            ?>
         </div>
     </main>
     <footer>
