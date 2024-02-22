@@ -1,0 +1,3 @@
+admin|admin
+pasha|pasha
+pasha|pasha
