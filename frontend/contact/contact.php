@@ -26,10 +26,9 @@ if (!isset($_SESSION['username'])) {
         
         // Получаем данные из формы и создаем объект JavaScript
         var formData = {
-            name: $("#name").val(),
+            name: "<?php echo isset($_SESSION['username']) ? $_SESSION['username'] : '' ?>",
             email: $("#email").val(),
             message: $("#message").val(),
-            userId: "<?php echo isset($_SESSION['username']) ? $_SESSION['username'] : '' ?>" // Добавляем идентификатор текущего пользователя
         };
         
         // Преобразуем данные в формат JSON
@@ -45,7 +44,6 @@ if (!isset($_SESSION['username'])) {
                 // Обработка успешного ответа от сервера
                 console.log(response);
                 // Очищаем поля формы после успешной отправки сообщения
-                $("#name").val("");
                 $("#email").val("");
                 $("#message").val("");
                 // Загружаем обновленные сообщения
@@ -86,8 +84,6 @@ if (!isset($_SESSION['username'])) {
         <div class="contact-form">
             <h2>Отправить сообщение</h2>
             <form id="contact_form" method="post">
-                <label for="name">Ваше имя:</label><br>
-                <input type="text" id="name" name="name" required placeholder="имя"><br>
                 <label for="email">Ваш email:</label><br>
                 <input type="text" id="email" name="email" required placeholder="email"><br>
                 <label for="message">Сообщение:</label><br>

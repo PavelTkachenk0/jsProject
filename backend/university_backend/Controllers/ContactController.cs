@@ -4,7 +4,7 @@ using university_backend.DAL;
 using university_backend.DAL.Models;
 using university_backend.Models;
 
-namespace YourNamespace.Controllers;
+namespace university_backend.Controllers;
 
 public class ContactController(AppDbContext dbContext) : Controller
 {
@@ -18,13 +18,12 @@ public class ContactController(AppDbContext dbContext) : Controller
         {
             return BadRequest("Invalid JSON data");
         }
-        // Читаем данные из запроса
+
         var message = new ContactMessage
         {
             Name = req.Name,
             Email = req.Email,
-            Message = req.Message,
-            UserId = req.UserId
+            Message = req.Message
         };
 
         _dbContext.Messages.Add(message);

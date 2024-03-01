@@ -12,7 +12,4 @@ public class ContactMessageDTO
 
     [JsonProperty("message")]
     public string Message { get; set; } = null!;
-
-    [JsonProperty("userId")]
-    public string UserId { get; set; } = null!;
 }
