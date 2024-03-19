@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using university_backend.DAL;
 using university_backend.DAL.Models;
@@ -12,7 +13,8 @@ public class CourseController(AppDbContext dbContext) : Controller
     private readonly AppDbContext _appDbContext = dbContext;
 
     [HttpPost]
-    [Route("api/course")]
+    [Route("api/admin/course")]
+    [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> PostCourse([FromBody] CourseDTO req, CancellationToken ct)
     {
         if (req == null)
@@ -20,15 +22,13 @@ public class CourseController(AppDbContext dbContext) : Controller
             return BadRequest("Invalid JSON data");
         }
 
-        var course = new Course
+        await _appDbContext.AddAsync(new Course
         {
             Name = req.Name,
             Description = req.Description,
             Duration = req.Duration,
             Teacher = req.Teacher
-        };
-
-        await _appDbContext.AddAsync(course, ct);
+        }, ct);
 
         await _appDbContext.SaveChangesAsync(ct);
 
@@ -36,10 +36,13 @@ public class CourseController(AppDbContext dbContext) : Controller
     }
 
     [HttpGet]
-    [Route("api/course/{id:int}")]
-    public async ValueTask<CourseResponse?> GetCourse([FromRoute] int id, CancellationToken ct)
+    [Route("api/admin/course/{id:int}")]
+    [ProducesResponseType<CourseResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IActionResult> GetCourse([FromRoute] int id, CancellationToken ct)
     {
-        return await _appDbContext.Courses.Where(x => x.Id == id).Select(x => new CourseResponse
+        var result =  await _appDbContext.Courses.Where(x => x.Id == id).Select(x => new CourseResponse
         {
             Id = x.Id,
             Name = x.Name,
@@ -47,13 +50,23 @@ public class CourseController(AppDbContext dbContext) : Controller
             Duration = x.Duration,
             Teacher = x.Teacher
         }).SingleOrDefaultAsync(ct);
+
+        if(result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
     }
 
     [HttpGet]
     [Route("api/courses")]
-    public async ValueTask<CourseResponse[]> GetCourses(CancellationToken ct)
+    [ProducesResponseType<CourseResponse[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin, Guest")]
+    public async ValueTask<IActionResult> GetCourses(CancellationToken ct)
     {
-        return await _appDbContext.Courses.Select(x => new CourseResponse
+        var result = await _appDbContext.Courses.Select(x => new CourseResponse
         {
             Id = x.Id,
             Name = x.Name,
@@ -61,10 +74,18 @@ public class CourseController(AppDbContext dbContext) : Controller
             Duration = x.Duration,
             Teacher = x.Teacher
         }).ToArrayAsync(ct);
+    
+        if (!result.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
     }
 
     [HttpDelete]
-    [Route("api/course/{id:int}")]
+    [Route("api/admin/course/{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> DeleteCourse([FromRoute] int id, CancellationToken ct)
     {
         var result = await _appDbContext.Courses.SingleOrDefaultAsync(x => x.Id == id, ct);
