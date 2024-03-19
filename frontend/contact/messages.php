@@ -85,7 +85,7 @@ if (!isset($_SESSION['username'])) {
                         // Вставляем каждое сообщение в контейнер
                         messages.forEach(function(message) {
                             // Проверяем, совпадает ли отправитель с текущим пользователем
-                            if (message.userId === currentUser) {
+                            if (message.name === currentUser) {
                                 // Создаем строку для таблицы с данными сообщения
                                 var row = "<tr>" +
                                             "<td>" + message.name + "</td>" +

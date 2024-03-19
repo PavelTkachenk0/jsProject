@@ -8,36 +8,8 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-// Путь к файлу для записи сообщений
-$contactsFile = 'contacts.txt';
-
-// Обработка отправки формы сообщения
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Получаем данные из формы
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $message = $_POST['message'];
-
-    // Создаем сообщение для записи в файл
-    $contactData = "Name: $name\nEmail: $email\nMessage: $message\n\n";
-
-    // Открываем файл для добавления нового сообщения
-    $file = fopen($contactsFile, "a");
-    if ($file) {
-        // Записываем данные в файл
-        fwrite($file, $contactData);
-        
-        // Закрываем файл
-        fclose($file);
-
-        // Выводим сообщение об успешной отправке
-        echo "success";
-    } else {
-        // Выводим сообщение об ошибке, если файл не удалось открыть
-        echo "error";
-    }
-    exit; // Прекращаем выполнение скрипта после отправки ответа AJAX
-}
+// Проверяем, является ли пользователь администратором
+$is_admin = ($_SESSION['username'] === 'admin');
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../js/bootstrap.min.js"></script>
     <script>
        $(document).ready(function() {
+        <?php if ($is_admin): ?>
         // Функция для отправки данных формы при добавлении курса
         $("#add_course_form").submit(function(event) {
             event.preventDefault(); // Предотвращаем стандартное поведение отправки формы
@@ -95,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             });
         });
+        <?php endif; ?>
     });
 
     </script>
@@ -114,6 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </ul>
     </nav>
     <main>
+        <?php if ($is_admin): ?>
         <h2>Добавить курс</h2>
         <!-- Форма для добавления курса -->
         <form id="add_course_form" method="post">
@@ -135,69 +110,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <button type="submit" class="btn btn-primary">Добавить курс</button>
         </form>
+        <?php endif; ?>
 
         <!-- Контейнер для таблицы -->
-            <!-- Контейнер для таблицы -->
-            <div class="table-container">
-                <h2>Курсы</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Курс</th>
-                            <th scope="col">Описание</th>
-                            <th scope="col">Продолжительность</th>
-                            <th scope="col">Преподаватели</th>
-                            <th scope="col">Действия</th> <!-- Добавляем столбец для кнопок действий -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Считываем данные из файла courses.txt и выводим каждый курс в виде строки таблицы
-                        $file = fopen("courses.txt", "r");
-                        if ($file) {
-                            while (($line = fgets($file)) !== false) {
-                                $data = explode('|', $line);
-                                echo "<tr>";
-                                echo "<td>$data[0]</td>";
-                                echo "<td>$data[1]</td>";
-                                echo "<td>$data[2]</td>";
-                                echo "<td>$data[3]</td>";
+        <div class="table-container">
+            <h2>Курсы</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Курс</th>
+                        <th scope="col">Описание</th>
+                        <th scope="col">Продолжительность</th>
+                        <th scope="col">Преподаватели</th>
+                        <?php if ($is_admin): ?>
+                        <th scope="col">Действия</th> <!-- Добавляем столбец для кнопок действий -->
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Считываем данные из файла courses.txt и выводим каждый курс в виде строки таблицы
+                    $file = fopen("courses.txt", "r");
+                    if ($file) {
+                        while (($line = fgets($file)) !== false) {
+                            $data = explode('|', $line);
+                            echo "<tr>";
+                            echo "<td>$data[0]</td>";
+                            echo "<td>$data[1]</td>";
+                            echo "<td>$data[2]</td>";
+                            echo "<td>$data[3]</td>";
+                            if ($is_admin) {
                                 echo "<td><button class='btn btn-danger btn-sm delete-course' data-course='$line'>Удалить</button></td>"; // Добавляем кнопку "Удалить"
-                                echo "</tr>";
                             }
-                            fclose($file);
+                            echo "</tr>";
                         }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- <script>
-               $(document).ready(function() {
-                // Обработчик клика по кнопке "Удалить"
-                $(".delete-course").click(function() {
-                    var courseData = $(this).data('course'); // Получаем данные строки курса
-                    var row = $(this).closest("tr"); // Получаем строку таблицы для удаления после успешного удаления из базы данных
-                    
-                    // Отправляем AJAX-запрос на сервер для удаления курса
-                    $.ajax({
-                        type: "POST",
-                        url: "delete_course.php",
-                        data: { courseData: courseData },
-                        success: function(response) {
-                            if (response == "success") {
-                                // Если удаление прошло успешно, удаляем строку таблицы без перезагрузки страницы
-                                row.remove();
-                            } else {
-                                alert("Ошибка при удалении курса.");
-                            }
-                        }
-                    });
-                });
-            });
-
-            </script> -->
-
+                        fclose($file);
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
     </main>
     <footer>
         &copy; 2024 МГТУ им. Баумана. Все права защищены.

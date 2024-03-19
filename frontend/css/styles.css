@@ -109,6 +109,16 @@ button[type=submit]:hover {
     background-color: #45a049; /* Темно-зеленый цвет */
 }
 
+button[type=pick]{
+    width: 10%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-top: 5px;
+}
 .contact-form form {
     display: flex;
     flex-direction: column;
