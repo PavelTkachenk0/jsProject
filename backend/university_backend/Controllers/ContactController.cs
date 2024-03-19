@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using university_backend.DAL;
 using university_backend.DAL.Models;
@@ -7,12 +8,14 @@ using university_backend.Models.Responses;
 
 namespace university_backend.Controllers;
 
+
 public class ContactController(AppDbContext dbContext) : Controller
 {
     private readonly AppDbContext _dbContext = dbContext;
 
     [HttpPost]
-    [Route("api/contact")]
+    [Route("api/guest/contact")]
+    [Authorize(Roles = "Admin, Guest")]
     public async ValueTask<IActionResult> PostMessage([FromBody] ContactMessageDTO req, CancellationToken ct)
     {
         if (req == null)
@@ -20,32 +23,61 @@ public class ContactController(AppDbContext dbContext) : Controller
             return BadRequest("Invalid JSON data");
         }
 
-        var message = new ContactMessage
+        await _dbContext.Messages.AddAsync(new ContactMessage
         {
-            Name = "",
+            Login = HttpContext.User.Identity!.Name!,
             Email = req.Email,
             Message = req.Message
-        };
-
-        await _dbContext.Messages.AddAsync(message, ct);
+        }, ct);
 
         await _dbContext.SaveChangesAsync(ct);
 
         return Ok();
-       
     }
 
     [HttpGet]
-    [Route("api/contacts")]
-    public async ValueTask<ContactMessageResponse[]?> GetMessages(CancellationToken ct)
+    [Route("api/guest/contacts")]
+    [ProducesResponseType<ContactMessageResponse[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Guest")]
+    public async ValueTask<IActionResult> GetUserMessages(CancellationToken ct)
     {
-        return await _dbContext.Messages.Select(x => new ContactMessageResponse
+        var result = await _dbContext.Messages.Where(x => x.Login == HttpContext.User.Identity!.Name).Select(x => new ContactMessageResponse
         {
             Id = x.Id,
-            Name = x.Name,
+            Login = x.Login,
             Email = x.Email,
             Message = x.Message
         }).ToArrayAsync(ct);
 
+        if (!result.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("api/admin/contacts")]
+    [ProducesResponseType<ContactMessageResponse[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IActionResult> GetMessages(CancellationToken ct)
+    {
+        var result = await _dbContext.Messages.Select(x => new ContactMessageResponse
+        {
+            Id = x.Id,
+            Login = x.Login,
+            Email = x.Email,
+            Message = x.Message
+        }).ToArrayAsync(ct);
+
+        if (!result.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
     }
 }
