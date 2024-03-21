@@ -7,6 +7,7 @@ using System.Security.Claims;
 using university_backend.DAL;
 using university_backend.DAL.Models;
 using university_backend.Models;
+using university_backend.Models.Responses;
 
 namespace university_backend.Controllers;
 
@@ -16,10 +17,11 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
 
     [HttpPost]
     [AllowAnonymous]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Route("api/auth/login")]
-    public async Task<IActionResult> Login(string? returnUrl, [FromBody] UserDTO model, CancellationToken ct)
+    public async Task<IActionResult> Login([FromBody] UserDTO model, CancellationToken ct)
     {
-
         var user = await _appDbContext.AppUsers
             .Where(x => x.Login == model.Login)
             .Select(x => new
@@ -53,13 +55,22 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-        return Redirect(returnUrl ?? "/");
+        var response = new AuthResponse
+        {
+            Login = model.Login,
+            Password = model.Password,
+            Roles = user.Roles.Select(role => new Claim(ClaimTypes.Role, role).Value).ToArray()
+        };
+
+        return Ok(response);
     }
 
     [HttpPost]
     [AllowAnonymous]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Route("api/auth/register")]
-    public async Task<IActionResult> Register(string? returnUrl, [FromBody] UserDTO model, CancellationToken ct)
+    public async Task<IActionResult> Register([FromBody] UserDTO model, CancellationToken ct)
     {
         var regUser = new AppUser
         {
@@ -80,7 +91,7 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
 
         await _appDbContext.SaveChangesAsync(ct);
 
-        return await Login(returnUrl, model, ct);
+        return await Login(model, ct);
     }
 
     [HttpPost]
