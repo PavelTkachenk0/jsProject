@@ -22,8 +22,13 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
     [Route("api/auth/login")]
     public async Task<IActionResult> Login([FromBody] UserDTO model, CancellationToken ct)
     {
+        if (model.Password == null) 
+        {
+            return Unauthorized("password is not valid");
+        }
+
         var user = await _appDbContext.AppUsers
-            .Where(x => x.Login == model.Login)
+            .Where(x => x.Login == model.Login && x.Password == model.Password)
             .Select(x => new
             {
                 x.Login,
@@ -58,7 +63,7 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
         var response = new AuthResponse
         {
             Login = model.Login,
-            Password = model.Password,
+            Password = model.Password!,
             Roles = user.Roles.Select(role => new Claim(ClaimTypes.Role, role).Value).ToArray()
         };
 
@@ -72,10 +77,15 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
     [Route("api/auth/register")]
     public async Task<IActionResult> Register([FromBody] UserDTO model, CancellationToken ct)
     {
+        if (model.Password == null)
+        {
+            return Unauthorized("password is not valid");
+        }
+
         var regUser = new AppUser
         {
             Login = model.Login,
-            Password = model.Password,
+            Password = model.Password!,
         };
 
         var userEntity = await _appDbContext.AppUsers.AddAsync(regUser, ct);
