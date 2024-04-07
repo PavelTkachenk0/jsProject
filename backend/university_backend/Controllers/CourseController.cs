@@ -101,4 +101,45 @@ public class CourseController(AppDbContext dbContext) : Controller
 
         return Ok();
     }
+
+    [HttpPut]
+    [Route("api/admin/course/{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IActionResult> UpdateCourse([FromRoute] int id, UpdateCourseDTO req, CancellationToken ct)
+    {
+        if (req == null)
+        {
+            return BadRequest("Invalid JSON data");
+        }
+
+        var query = await _appDbContext.Courses.SingleOrDefaultAsync(x => x.Id == id, ct);
+
+        if (query == null)
+        {
+            return BadRequest("Invalid id");
+        }
+
+        if(req.Name != null)
+        {
+            query.Name = req.Name;
+        }
+        if(req.Description != null)
+        {
+            query.Description = req.Description;
+        }
+        if(req.Duration != null)
+        {
+            query.Duration = req.Duration.Value;
+        }
+        if(req.Teacher != null)
+        {
+            query.Teacher = req.Teacher;
+        }
+
+        _appDbContext.Courses.Update(query);
+
+        await _appDbContext.SaveChangesAsync(ct);
+
+        return Ok();
+    }
 }

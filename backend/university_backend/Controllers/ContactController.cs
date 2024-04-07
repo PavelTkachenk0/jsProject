@@ -80,4 +80,30 @@ public class ContactController(AppDbContext dbContext) : Controller
 
         return Ok(result);
     }
+
+    [HttpPut]
+    [Route("/api/admin/contacts/{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IActionResult> PutMessage([FromRoute] int id, [FromBody] UpdateMessageDTO req, CancellationToken ct)
+    {
+        if (req == null)
+        {
+            return BadRequest("Invalid JSON data");
+        }
+
+        var query = await _dbContext.Messages.SingleOrDefaultAsync(x => x.Id == id);
+
+        if (query == null)
+        {
+            return BadRequest("Invalid id");
+        }
+
+        query.Message = req.Message;
+
+        _dbContext.Messages.Update(query);
+
+        await _dbContext.SaveChangesAsync(ct);
+
+        return Ok();
+    }
 }
