@@ -14,7 +14,7 @@ public class CourseController(AppDbContext dbContext) : Controller
 
     [HttpPost]
     [Route("api/admin/course")]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> PostCourse([FromBody] CourseDTO req, CancellationToken ct)
     {
         if (req == null)
@@ -37,9 +37,9 @@ public class CourseController(AppDbContext dbContext) : Controller
 
     [HttpGet]
     [Route("api/admin/course/{id:int}")]
+    // [Authorize(Roles = "Admin")]
     [ProducesResponseType<CourseResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> GetCourse([FromRoute] int id, CancellationToken ct)
     {
         var result =  await _appDbContext.Courses.Where(x => x.Id == id).Select(x => new CourseResponse
@@ -63,7 +63,7 @@ public class CourseController(AppDbContext dbContext) : Controller
     [Route("api/courses")]
     [ProducesResponseType<CourseResponse[]>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin, Guest")]
+    // [Authorize(Roles = "Admin, Guest")]
     public async ValueTask<IActionResult> GetCourses(CancellationToken ct)
     {
         var result = await _appDbContext.Courses.Select(x => new CourseResponse
@@ -85,7 +85,7 @@ public class CourseController(AppDbContext dbContext) : Controller
 
     [HttpDelete]
     [Route("api/admin/course/{id:int}")]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> DeleteCourse([FromRoute] int id, CancellationToken ct)
     {
         var result = await _appDbContext.Courses.SingleOrDefaultAsync(x => x.Id == id, ct);
@@ -104,8 +104,8 @@ public class CourseController(AppDbContext dbContext) : Controller
 
     [HttpPut]
     [Route("api/admin/course/{id:int}")]
-    [Authorize(Roles = "Admin")]
-    public async ValueTask<IActionResult> UpdateCourse([FromRoute] int id, UpdateCourseDTO req, CancellationToken ct)
+    // [Authorize(Roles = "Admin")]
+    public async ValueTask<IActionResult> UpdateCourse([FromRoute] int id, [FromBody]UpdateCourseDTO req, CancellationToken ct)
     {
         if (req == null)
         {

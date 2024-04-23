@@ -13,7 +13,7 @@ public class UserController(AppDbContext appDbContext) : Controller
     private readonly AppDbContext _appDbContext = appDbContext;
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("api/admin/users/register")]
@@ -82,7 +82,7 @@ public class UserController(AppDbContext appDbContext) : Controller
     }
 
     [HttpDelete]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("api/admin/users/{id:int}")]
@@ -103,7 +103,7 @@ public class UserController(AppDbContext appDbContext) : Controller
     }
 
     [HttpPut]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [Route("api/admin/users/{id:int}")]
     public async ValueTask<IActionResult> UpdateUser([FromRoute] int id, UpdateUserDTO req, CancellationToken ct)
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using university_backend.DAL;
@@ -15,7 +16,7 @@ public class ContactController(AppDbContext dbContext) : Controller
 
     [HttpPost]
     [Route("api/guest/contact")]
-    [Authorize(Roles = "Admin, Guest")]
+    // [Authorize(Roles = "Admin, Guest")]
     public async ValueTask<IActionResult> PostMessage([FromBody] ContactMessageDTO req, CancellationToken ct)
     {
         if (req == null)
@@ -37,9 +38,10 @@ public class ContactController(AppDbContext dbContext) : Controller
 
     [HttpGet]
     [Route("api/guest/contacts")]
+    [EnableCors("MyPolicy")]
     [ProducesResponseType<ContactMessageResponse[]>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Guest")]
+    // [Authorize(Roles = "Guest, Admin")]
     public async ValueTask<IActionResult> GetUserMessages(CancellationToken ct)
     {
         var result = await _dbContext.Messages.Where(x => x.Login == HttpContext.User.Identity!.Name).Select(x => new ContactMessageResponse
@@ -60,9 +62,10 @@ public class ContactController(AppDbContext dbContext) : Controller
 
     [HttpGet]
     [Route("api/admin/contacts")]
+    // [EnableCors("MyPolicy")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType<ContactMessageResponse[]>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> GetMessages(CancellationToken ct)
     {
         var result = await _dbContext.Messages.Select(x => new ContactMessageResponse
@@ -83,7 +86,7 @@ public class ContactController(AppDbContext dbContext) : Controller
 
     [HttpPut]
     [Route("/api/admin/contacts/{id:int}")]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public async ValueTask<IActionResult> PutMessage([FromRoute] int id, [FromBody] UpdateMessageDTO req, CancellationToken ct)
     {
         if (req == null)

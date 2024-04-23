@@ -106,7 +106,7 @@ public class AuthenticationController(AppDbContext appDbContext) : Controller
 
     [HttpPost]
     [Route("api/auth/logout")]
-    [Authorize(Roles = "Admin, Guest")]
+    // [Authorize(Roles = "Admin, Guest")]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
