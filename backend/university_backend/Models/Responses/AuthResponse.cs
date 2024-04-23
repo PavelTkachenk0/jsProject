@@ -2,5 +2,5 @@
 
 public class AuthResponse : UserDTO
 {
-    public string[] Roles { get; set; } = [];
+    public string[] Roles { get; set; } = null!;
 }

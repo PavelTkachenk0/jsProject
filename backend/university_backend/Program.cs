@@ -15,18 +15,20 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("JsProject"));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("JsProject"));
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigin",
-            builder =>
-            {
-                builder.WithOrigins("http://lab1")
-                       .AllowAnyHeader()
-                       .AllowAnyMethod();
-            });
+    options.AddPolicy(name: "MyPolicy",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                ;
+        });
 });
 
 var app = builder.Build();
@@ -39,14 +41,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+// app.UseCors(x => x
+//     .AllowAnyMethod()
+//     .AllowAnyHeader()
+//     .SetIsOriginAllowed(o => true)
+//     .AllowCredentials()
+// );
+app.UseCors("MyPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors("AllowOrigin"); 
 
 app.UseEndpoints(endpoints =>
-{  
+{
     endpoints.MapControllers();
+    // endpoints.MapGet("/api", x => x.Response.WriteAsync("api")).RequireCors("MyPolicy");
 });
 
 app.Run();
